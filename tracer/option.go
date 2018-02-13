@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/DataDog/dd-trace-go/dd"
+	"github.com/DataDog/dd-trace-go/tracer/ext"
 )
 
 // config holds the tracer configuration.
@@ -84,24 +85,6 @@ func WithGlobalTag(k string, v interface{}) StartOption {
 	}
 }
 
-// WithGlobalTags sets the given consecutive key/value pairs as tags on all
-// spans created by the tracer. If the arguments to this function are zero,
-// odd or contain any keys which are not of type string, it will panic.
-func WithGlobalTags(kv ...interface{}) StartOption {
-	if n := len(kv); n < 2 || n%2 != 0 {
-		panic("uneven number of arguments supplied")
-	}
-	return func(c *config) {
-		for i := 0; i <= len(kv)-2; i = i + 2 {
-			k, ok := kv[i].(string)
-			if !ok {
-				panic("all keys must be strings")
-			}
-			WithGlobalTag(k, kv[i+1])(c)
-		}
-	}
-}
-
 // WithSampler sets the given sampler to be used with the tracer. By default
 // an all-permissive sampler is used.
 func WithSampler(s Sampler) StartOption {
@@ -125,17 +108,17 @@ func Tag(k string, v interface{}) StartSpanOption {
 
 // ServiceName sets the given service name on the started span.
 func ServiceName(name string) StartSpanOption {
-	return Tag(serviceName, name)
+	return Tag(ext.ServiceName, name)
 }
 
 // ResourceName sets the given resource name on the started span.
 func ResourceName(name string) StartSpanOption {
-	return Tag(resourceName, name)
+	return Tag(ext.ResourceName, name)
 }
 
 // SpanType sets the given span type on the started span.
 func SpanType(name string) StartSpanOption {
-	return Tag(spanType, name)
+	return Tag(ext.SpanType, name)
 }
 
 // ChildOf tells StartSpan to use the given context as a parent for the

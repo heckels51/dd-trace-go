@@ -93,15 +93,6 @@ func (s *span) BaggageItem(key string) string {
 	return s.context.baggage[key]
 }
 
-const (
-	// spanType defines the Span type (web, db, cache)
-	spanType = "span.type"
-	// serviceName defines the Service name for this Span
-	serviceName = "service.name"
-	// resourceName defines the Resource name for the Span
-	resourceName = "resource.name"
-)
-
 // SetTag adds a tag to the span, overwriting pre-existing values for
 // the given key.
 func (s *span) SetTag(key string, value interface{}) dd.Span {
@@ -116,7 +107,7 @@ func (s *span) SetTag(key string, value interface{}) dd.Span {
 	if v, ok := toFloat64(value); ok {
 		// sent as numeric value, so we can store it as a metric
 		switch key {
-		case "sampling.priority":
+		case ext.SamplingPriority:
 			// setting sampling priority per spec
 			s.Metrics[samplingPriorityKey] = v
 		default:
@@ -125,13 +116,13 @@ func (s *span) SetTag(key string, value interface{}) dd.Span {
 		return s
 	}
 	switch key {
-	case serviceName:
+	case ext.ServiceName:
 		s.Service = fmt.Sprint(value)
-	case resourceName:
+	case ext.ResourceName:
 		s.Resource = fmt.Sprint(value)
-	case spanType:
+	case ext.SpanType:
 		s.Type = fmt.Sprint(value)
-	case "error":
+	case ext.Error:
 		switch v := value.(type) {
 		case bool:
 			// bool value as per Opentracing spec.

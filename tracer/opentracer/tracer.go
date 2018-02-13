@@ -2,16 +2,21 @@ package opentracer
 
 import (
 	"github.com/DataDog/dd-trace-go/dd"
-	"github.com/DataDog/dd-trace-go/internal"
 	"github.com/DataDog/dd-trace-go/tracer"
+	"github.com/DataDog/dd-trace-go/tracer/internal"
 
 	opentracing "github.com/opentracing/opentracing-go"
 )
 
-// Get returns an opentracing compatible version of the started tracer. If no tracer was started,
-// the resulting tracer is a no-op.
-func Get() opentracing.Tracer {
-	return &opentracer{internal.GlobalTracer}
+// Start starts the tracer using the given options and registers it as the global
+// opentracing tracer using opentracing.SetGlobalTracer. After calling Start, you
+// may use the opentracing API as usual. Using this API in parallel with the tracer
+// API is fully supported as both implementations are using the same tracer under
+// the hood.
+func Start(opts ...tracer.StartOption) {
+	tracer.Start(opts...)
+	t := &opentracer{internal.GlobalTracer}
+	opentracing.SetGlobalTracer(t)
 }
 
 var _ opentracing.Tracer = (*opentracer)(nil)

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/DataDog/dd-trace-go/dd"
-	"github.com/DataDog/dd-trace-go/internal"
 	"github.com/DataDog/dd-trace-go/tracer/ext"
+	"github.com/DataDog/dd-trace-go/tracer/internal"
 )
 
 var _ dd.Tracer = (*tracer)(nil)
